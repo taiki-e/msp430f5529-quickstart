@@ -10,7 +10,7 @@
 //! As with [timer] and [timer-oncecell], this example uses the `TIMER0_A1` interrupt to blink
 //! LEDs on the [MSP-EXP430G2](http://www.ti.com/tool/MSP-EXP430G2) development kit.
 //!
-//! [steal]: msp430g2553::Peripherals::steal
+//! [steal]: msp430f5529::Peripherals::steal
 //!
 //! ---
 

@@ -1,6 +1,6 @@
 MEMORY
 {
-  /* These values are correct for the msp430g2553 device. You will need to
+  /* These values are correct for the msp430f5529 device. You will need to
      modify these values if using a different device. Room must be reserved
      for interrupt vectors plus reset vector and the end of the first 64kB
      of address space. */

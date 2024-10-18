@@ -1,4 +1,4 @@
-# `msp430-quickstart`
+# `msp430f5529-quickstart`
 
 > A template for building applications for TI MSP430 microcontrollers.
 
@@ -50,20 +50,20 @@ This project is developed and maintained by the [MSP430 team][team].
    - Where does flash memory, RAM, and interrupt vectors begin in the address
      space?
 
-   `msp430g2553` is used for the examples in this crate. Answering the first
+   `msp430f5529` is used for the examples in this crate. Answering the first
    question above:
 
-   - `msp430g2553` belongs to the [`MSP430x2xx` family](https://www.ti.com/lit/ug/slau144j/slau144j.pdf).
+   - `msp430f5529` belongs to the [`MSP430x5xx` family](https://www.ti.com/lit/ug/slau208q/slau208q.pdf).
 
-   The linked family manual and [datasheet](http://www.ti.com/lit/ds/slas735j/slas735j.pdf)
+   The linked family manual and [datasheet](https://www.ti.com/lit/ds/slas590p/slas590p.pdf)
    can be used to answer the remaining questions:
 
-   - The `msp430g2553` PAC exists already and can be found on [crates.io](https://crates.io/crates/msp430g2553).
+   - The `msp430f5529` PAC exists already and can be found on [crates.io](https://crates.io/crates/msp430f5529).
 
-   - `msp430g2553` has 16kB of flash memory, 512 bytes of RAM, and 16 vectors.
+   - `msp430f5529` has 128kB of flash memory, 8kB of RAM, and 64 vectors.
 
-   - Flash memory begins at address 0xC000. RAM begins at address 0x0200.
-     The interrupt vectors begin at 0xFFE0.
+   - Flash memory begins at address 0x4400. RAM begins at address 0x2200.
+     The interrupt vectors begin at 0xFF80.
 
 1. If your particular device does not have a PAC crate, you will need to
    generate one using `svd2rust` and possibly [publish](https://doc.rust-lang.org/cargo/reference/publishing.html)
@@ -83,7 +83,7 @@ This project is developed and maintained by the [MSP430 team][team].
 2. Instantiate the template.
 
    ``` console
-   $ cargo generate --git https://github.com/rust-embedded/msp430-quickstart
+   $ cargo generate --git https://github.com/cr1901/msp430f5529-quickstart
    Project Name: app
    Creating project called `app`...
    Done! New project created /tmp/app
@@ -91,11 +91,11 @@ This project is developed and maintained by the [MSP430 team][team].
    $ cd app
    ```
 
-3. If not targeting `msp430g2553`, replace the PAC entry for `msp430g2553` in
+3. If not targeting `msp430f5529`, replace the PAC entry for `msp430f5529` in
    `Cargo.toml` with that of your device, e.g.:
 
    ``` toml
-   # [dependencies.msp430g2553]
+   # [dependencies.msp430f5529]
    # version = "0.2.0"
    # features = ["rt"]
    [dependencies.msp430fr2355]
@@ -112,13 +112,13 @@ This project is developed and maintained by the [MSP430 team][team].
    $ cat memory.x
    MEMORY
    {
-     /* These values are correct for the msp430g2553 device. You will need to
+     /* These values are correct for the msp430f5529 device. You will need to
         modify these values if using a different device. Room must be reserved
         for interrupt vectors plus reset vector and the end of the first 64kB
         of address space. */
-     RAM : ORIGIN = 0x0200, LENGTH = 0x0200
-     ROM : ORIGIN = 0xC000, LENGTH = 0x3FE0
-     VECTORS : ORIGIN = 0xFFE0, LENGTH = 0x20
+     RAM : ORIGIN = 0x2200, LENGTH = 0x2000
+     ROM : ORIGIN = 0x4400, LENGTH = 0xBB80
+     VECTORS : ORIGIN = 0xFF80, LENGTH = 0x80
    }
    ```
 
