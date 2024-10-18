@@ -6,31 +6,41 @@ This project is developed and maintained by the [MSP430 team][team].
 
 ## Dependencies
 
-- Rust nightly-2019-03-27 or a newer toolchain. _Only nightly compilers work
+- Rust nightly-2022-01-24 or a newer toolchain. _Only nightly compilers work
   for now._
 
-  You can set up a nightly compiler as the default compiler using
-  `rustup default nightly`. Alternatively, you can set up overrides on a
-  project basis using `rustup override set --path /path/to/crate nightly-YYYY-MM-DD`
+  The [`rust-toolchain.toml`](./rust-toolchain.toml) file makes sure this step
+  is done for you. This file tells [`rustup`](https://rustup.rs/) to download
+  and use nightly compiler for this crate, as well as download the compiler
+  source to build `libcore`.
 
-- The `cargo generate` subcommand ([Installation instructions](https://github.com/ashleygwilliams/cargo-generate#installation)).
+  You can manually set up a nightly compiler as the default for all MSP430
+  projects by running:
 
-- The [`xargo`](https://github.com/japaric/xargo) sysroot manager.
-  `xargo` is required until MSP430's `libcore` is part of Rust CI). To
-  install, run:
   ``` console
-  $ cargo install xargo
+  $ rustup default nightly
   $ rustup component add rust-src
   ```
+
+  Alternatively, you can manually set up overrides on a project basis using:
+
+  ```console
+  $ rustup override set --path /path/to/crate nightly-YYYY-MM-DD`.
+  $ rustup component add --toolchain nightly-YYYY-MM-DD rust-src
+  ```
+
+- The `cargo generate` subcommand ([Installation instructions](https://github.com/ashleygwilliams/cargo-generate#installation)).
 
 - TI's [MSP430 GCC Compiler](http://www.ti.com/tool/MSP430-GCC-OPENSOURCE),
   version 8.3.0 or greater. `msp430-elf-gcc` should be visible on the path.
 
-- [`svd2rust`](https://github.com/rust-embedded/svd2rust), commit 783fbd0 or
-  newer.
+The following dependencies are required in order to generate a peripheral access crate (see *Using this template* below)
 
-- [`msp430_svd`](https://github.com/pftbest/msp430_svd), commit e1eb730 or
-  newer. Cloning the repo and following the directions in README.md is
+- [`svd2rust`](https://github.com/rust-embedded/svd2rust), version 0.20.0 or
+  a newer commit.
+
+- [`msp430_svd`](https://github.com/pftbest/msp430_svd), version 0.3.0 or a
+  newer commit. Cloning the repo and following the directions in README.md is
   sufficient.
 
 ## Using this template
@@ -80,7 +90,7 @@ This project is developed and maintained by the [MSP430 team][team].
    [`msp430_svd`](https://github.com/pftbest/msp430_svd/tree/master/msp430-gcc-support-files)
    repository.
 
-2. Instantiate the template.
+2. Instantiate the template and follow the prompts.
 
    ``` console
    $ cargo generate --git https://github.com/cr1901/msp430f5529-quickstart
@@ -96,7 +106,7 @@ This project is developed and maintained by the [MSP430 team][team].
 
    ``` toml
    # [dependencies.msp430f5529]
-   # version = "0.2.0"
+   # version = "0.3.0"
    # features = ["rt"]
    [dependencies.msp430fr2355]
    version = "0.4.0"
@@ -122,17 +132,39 @@ This project is developed and maintained by the [MSP430 team][team].
    }
    ```
 
-5. Build the template application or one of the examples. If building
-   `timer-oncecell`, don't forget to uncomment the `once_cell` dependency in
-   `Cargo.toml`!
+5. Build the template application or one of the examples. Some examples
+   (such as `timer` or `temp-hal`) may not compile due to size
+   constraints when building using the `dev` profile (the default). Pass the
+   `--release` option to `cargo build` in these cases.
 
    ``` console
-   $ xargo build
-   $ xargo build --examples
+   $ cargo build
+   $ cargo build --examples
    ```
 
-   `Xargo.toml` is set up properly for nearly all use cases and need not be
-   modified.
+   Note that due to [`.cargo/config`](.cargo/config) and [`rust-toolchain.toml`](./rust-toolchain.toml),
+   the above is shorthand for:
+
+   ``` console
+   $ cargo +nightly build --target=msp430-none-elf -Zbuild-std=core
+   $ cargo +nightly build --target=msp430-none-elf -Zbuild-std=core --examples
+   ```
+
+   You may wish to experiment with other commented options in `.cargo/config`.
+
+6. Once you have an ELF binary built, flash it to your microcontroller. Use [`mspdebug`](https://github.com/dlbeer/mspdebug) to launch a debug session and `msp430-elf-gdb` with the linked gdb script. For the msp430f5529 and the MSP-EXP430G2 launchpad board this looks like the following:
+
+   In one terminal session
+   ```console
+   $ mspdebug -C mspdebug.cfg rf2500
+   ```
+
+   In another terminal session
+   ```console
+   $ msp430-elf-gdb -x mspdebug.gdb target/msp430-none-elf/debug/app
+   ```
+
+   This will flash your Rust code to the microcontroller and open a gdb debugging session to step through it.
 
 # License
 
